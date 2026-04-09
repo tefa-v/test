@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صانع دعوات احترافي V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&family=Cairo:wght@400;700;800&family=Almarai:wght@400;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #10b981;
+            --secondary-hover: #059669;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%;
+            max-width: 1200px;
+            gap: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (min-width: 900px) {
+            .app-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .preview-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: sticky;
+            top: 20px;
+        }
+
+        .canvas-wrapper {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--glass-border);
+            position: relative;
+        }
+
+        .canvas-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
+            z-index: -1;
+            border-radius: 18px;
+            opacity: 0.5;
+            filter: blur(8px);
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        details {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        details[open] {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        summary {
+            font-size: 1.1rem;
+            padding: 18px 20px;
+            color: #93c5fd;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: "▼";
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .details-content {
+            padding: 0 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="text"],
+        select,
+        input[type="color"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select option {
+            background: var(--bg-dark);
+            color: white;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #93c5fd;
+            transition: all 0.3s ease;
+            font-weight: 700;
+        }
+
+        .file-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .file-btn.secondary {
+            border-color: var(--glass-border);
+            border-style: solid;
+            color: var(--text-main);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            height: 6px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .switch-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+
+        .switch-group label {
+            margin: 0;
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.2);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .actions-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--secondary), #047857);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        input[type="color"] {
+            height: 45px;
+            padding: 3px;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .val-display {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="control-panel">
+            <div style="text-align: right; margin-bottom: 20px;">
+                <h1 style="font-size: 1.8rem; background: linear-gradient(to right, #60a5fa, #a78bfa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    الدعوة الاحترافية <span style="font-size: 1rem; background: var(--accent); color: white; padding: 2px 8px; border-radius: 8px; vertical-align: top;">V2</span></h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">قم بتخصيص دعوتك باستخدام الأدوات المتقدمة</p>
+            </div>
+
+            <details>
+                <summary>🎨 القالب والخلفية</summary>
+                <div class="details-content">
+                    <label class="file-btn secondary" for="bgImageUpload">🖼️ إرفع خلفية خاصة بك (اختياري)</label>
+                    <input type="file" id="bgImageUpload" accept="image/*">
+                    <button class="btn btn-share" id="resetBgBtn" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; cursor:pointer;">استعادة الخلفية الافتراضية</button>
+                </div>
+            </details>
+
+            <details open>
+                <summary>👤 الصورة الشخصية</summary>
+                <div class="details-content">
+                    <label class="file-btn" for="userImageUpload">📸 اختار صورتك من هنا</label>
+                    <input type="file" id="userImageUpload" accept="image/*">
+                    
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label>حجم الصورة <span class="val-display" id="scaleVal">100%</span></label>
+                        <input type="range" id="imageScale" min="0.5" max="3" value="1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>الدوران (Rotate) <span class="val-display" id="rotateVal">0°</span></label>
+                        <input type="range" id="imageRotate" min="-180" max="180" value="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>إزاحة أفقية <span class="val-display" id="imgXVal">0</span></label>
+                        <input type="range" id="imageX" min="-200" max="200" value="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>إزاحة رأسية <span class="val-display" id="imgYVal">0</span></label>
+                        <input type="range" id="imageY" min="-200" max="200" value="0" step="1">
+                    </div>
+
+                    <hr style="border-color: var(--glass-border); margin: 5px 0;">
+                    <label style="color: white; font-weight: bold;">فلاتر وتعديلات:</label>
+                    <div class="form-group">
+                        <label>السطوع (Brightness) <span class="val-display" id="brightVal">100%</span></label>
+                        <input type="range" id="imageBrightness" min="0" max="200" value="100" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>التشبع (Saturation) <span class="val-display" id="satVal">100%</span></label>
+                        <input type="range" id="imageSaturation" min="0" max="200" value="100" step="1">
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>✍️ نصوص الدعوة</summary>
+                <div class="details-content">
+                    <div class="form-group">
+                        <label>النص الجانبي / اللقب (اختياري)</label>
+                        <input type="text" id="subtextInput" placeholder="مثال: المهندس، يتشرف بدعوتكم..." maxlength="30">
+                    </div>
+                    <div class="form-group">
+                        <label>الإسم الكريم</label>
+                        <input type="text" id="nameInput" placeholder="اكتب الاسم هنا..." maxlength="40">
+                    </div>
+                    
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label>نوع الخط</label>
+                            <select id="fontFamily">
+                                <option value="Tajawal">تجوال (Tajawal)</option>
+                                <option value="Cairo">القاهرة (Cairo)</option>
+                                <option value="Almarai">المراعي (Almarai)</option>
+                                <option value="Amiri">أميري (Amiri)</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label>لون النص</label>
+                            <input type="color" id="textColor" value="#1e293b">
+                        </div>
+                    </div>
+
+                    <div class="switch-group">
+                        <label>تفعيل ظل للنص (للمقروئية)</label>
+                        <label class="switch">
+                            <input type="checkbox" id="textShadowEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <hr style="border-color: var(--glass-border); margin: 5px 0;">
+
+                    <div class="form-group">
+                        <label>حجم خط الإسم <span class="val-display" id="fontVal">42px</span></label>
+                        <input type="range" id="fontSize" min="20" max="100" value="42" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>موضع النص الأفقي <span class="val-display" id="textXVal">0</span></label>
+                        <input type="range" id="textX" min="-200" max="200" value="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>موضع النص الرأسي <span class="val-display" id="textYVal">0</span></label>
+                        <input type="range" id="textY" min="-200" max="200" value="0" step="1">
+                    </div>
+                </div>
+            </details>
+
+            <div class="actions-section">
+                <button class="btn btn-primary" id="shareBtn">📤 مشاركة</button>
+                <button class="btn btn-success" id="downloadBtn">📥 تحميل الدعوة</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="canvas-wrapper">
+                <canvas id="mainCanvas" width="1000" height="1000"></canvas>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem; max-width: 400px;">
+                معاينة حية للدعوة. حوّل أفكارك لواقع مبهر بضغطة زر!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        class TefaPremiumEngine {
+            constructor() {
+                this.tefa_author = "tefa";
+                this.tefa_license = "Premium Plus Rights Reserved";
+                this.tefa_verified = true;
+            }
+            verify() { return this.tefa_verified && this.tefa_author === "tefa"; }
+        }
+
+        const tefaManager = new TefaPremiumEngine();
+
+        (function () {
+            if (!tefaManager.verify()) return;
+
+            const baseConfig = { cx: 601.5, cy: 271.5, radius: 119.5 };
+            const textConfig = { x: 41, y: 231, width: 335, height: 77 };
+            const DEFAULT_TEMPLATE_URL = "https://i.postimg.cc/pVKRC32Z/IMG-20260409-WA0012.jpg";
+
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const userImageUpload = document.getElementById('userImageUpload');
+            const bgImageUpload = document.getElementById('bgImageUpload');
+            const resetBgBtn = document.getElementById('resetBgBtn');
+
+            const nameInput = document.getElementById('nameInput');
+            const subtextInput = document.getElementById('subtextInput');
+            const textColor = document.getElementById('textColor');
+            const fontFamily = document.getElementById('fontFamily');
+            const textShadowEnabled = document.getElementById('textShadowEnabled');
+
+            const imageScale = document.getElementById('imageScale');
+            const imageX = document.getElementById('imageX');
+            const imageY = document.getElementById('imageY');
+            const imageRotate = document.getElementById('imageRotate');
+            const imageBrightness = document.getElementById('imageBrightness');
+            const imageSaturation = document.getElementById('imageSaturation');
+
+            const fontSize = document.getElementById('fontSize');
+            const textX = document.getElementById('textX');
+            const textY = document.getElementById('textY');
+
+            let templateImage = null;
+            let userImage = null;
+
+            function initPremiumEngine() {
+                loadTemplate(DEFAULT_TEMPLATE_URL);
+                attachEventListeners();
+                
+                document.fonts.ready.then(() => {
+                    renderCanvas();
+                });
+            }
+
+            function loadTemplate(url) {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                    templateImage = img;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    renderCanvas();
+                };
+                img.src = url;
+            }
+
+            function renderCanvas() {
+                if (!templateImage) return;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.filter = 'none';
+                ctx.drawImage(templateImage, 0, 0, canvas.width, canvas.height);
+
+                if (userImage) {
+                    const scale = parseFloat(imageScale.value);
+                    const oX = parseInt(imageX.value);
+                    const oY = parseInt(imageY.value);
+                    const rot = parseInt(imageRotate.value);
+                    const bright = parseInt(imageBrightness.value);
+                    const sat = parseInt(imageSaturation.value);
+
+                    const scaledW = userImage.width * scale;
+                    const scaledH = userImage.height * scale;
+
+                    ctx.save();
+                    
+                    ctx.beginPath();
+                    ctx.arc(baseConfig.cx, baseConfig.cy, baseConfig.radius, 0, 2 * Math.PI);
+                    ctx.clip();
+
+                    ctx.filter = `brightness(${bright}%) saturate(${sat}%)`;
+
+                    ctx.translate(baseConfig.cx + oX, baseConfig.cy + oY);
+                    ctx.rotate(rot * Math.PI / 180);
+                    
+                    ctx.drawImage(userImage, -scaledW / 2, -scaledH / 2, scaledW, scaledH);
+                    
+                    ctx.restore();
+                }
+
+                const name = nameInput.value.trim();
+                const subtext = subtextInput.value.trim();
+                const selFont = fontFamily.value;
+                const size = parseInt(fontSize.value);
+                const tX = parseInt(textX.value);
+                const tY = parseInt(textY.value);
+
+                if (name || subtext) {
+                    ctx.save();
+                    
+                    if (textShadowEnabled.checked) {
+                        ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+                        ctx.shadowBlur = 8;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                    } else {
+                        ctx.shadowColor = "transparent";
+                    }
+
+                    ctx.fillStyle = textColor.value;
+                    ctx.textAlign = 'center';
+                    
+                    const finalX = textConfig.x + textConfig.width / 2 + tX;
+                    const finalY = textConfig.y + textConfig.height / 2 + tY;
+
+                    if (subtext) {
+                        ctx.font = `600 ${size * 0.55}px "${selFont}", Tahoma, sans-serif`;
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(subtext, finalX, finalY - (size * 0.6));
+                    }
+
+                    if (name) {
+                        ctx.font = `800 ${size}px "${selFont}", Tahoma, sans-serif`;
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(name, finalX, finalY);
+                    }
+
+                    ctx.restore();
+                }
+            }
+
+            function attachEventListeners() {
+                userImageUpload.addEventListener('change', (e) => {
+                    handleImageUpload(e, (img) => {
+                        userImage = img;
+                        const minScale = Math.max((baseConfig.radius * 2) / img.width, (baseConfig.radius * 2) / img.height);
+                        imageScale.value = minScale * 1.02;
+                        updateUIValues();
+                        renderCanvas();
+                    });
+                });
+
+                bgImageUpload.addEventListener('change', (e) => {
+                    handleImageUpload(e, (img) => {
+                        templateImage = img;
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        renderCanvas();
+                    });
+                });
+
+                resetBgBtn.addEventListener('click', () => {
+                    loadTemplate(DEFAULT_TEMPLATE_URL);
+                    bgImageUpload.value = '';
+                });
+
+                const inputs = [
+                    imageScale, imageX, imageY, imageRotate, imageBrightness, imageSaturation,
+                    fontSize, textX, textY, nameInput, subtextInput, textColor, fontFamily, textShadowEnabled
+                ];
+
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        updateUIValues();
+                        renderCanvas();
+                    });
+                });
+
+                document.getElementById('downloadBtn').addEventListener('click', () => {
+                    if (!templateImage) return;
+                    renderCanvas();
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'premium_invitation_tefa.png';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }, 'image/png', 1.0);
+                });
+
+                document.getElementById('shareBtn').addEventListener('click', async () => {
+                    if (!templateImage) return;
+                    renderCanvas();
+                    canvas.toBlob(async (blob) => {
+                        const file = new File([blob], "invitation_premium.png", { type: "image/png" });
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                            try { await navigator.share({ files: [file], title: 'دعوتي الخاصة', text:'تشرفنا دعوتكم!' }); } catch (err) { }
+                        } else {
+                            document.getElementById('downloadBtn').click();
+                        }
+                    }, 'image/png');
+                });
+            }
+
+            function handleImageUpload(event, callback) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => callback(img);
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function updateUIValues() {
+                try{
+                    document.getElementById('scaleVal').textContent = Math.round(parseFloat(imageScale.value) * 100) + '%';
+                    document.getElementById('rotateVal').textContent = imageRotate.value + '°';
+                    document.getElementById('brightVal').textContent = imageBrightness.value + '%';
+                    document.getElementById('satVal').textContent = imageSaturation.value + '%';
+                    document.getElementById('imgXVal').textContent = imageX.value;
+                    document.getElementById('imgYVal').textContent = imageY.value;
+                    
+                    document.getElementById('fontVal').textContent = fontSize.value + 'px';
+                    document.getElementById('textXVal').textContent = textX.value;
+                    document.getElementById('textYVal').textContent = textY.value;
+                } catch(e){}
+            }
+
+            initPremiumEngine();
+        })();
+    </script>
+</body>
+</html>
