@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صانع دعوات احترافي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #10b981;
+            --secondary-hover: #059669;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%;
+            max-width: 1200px;
+            gap: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (min-width: 900px) {
+            .app-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .preview-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .canvas-wrapper {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--glass-border);
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .panel-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #93c5fd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        input[type="color"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            font-weight: 700;
+        }
+
+        .file-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            height: 6px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .actions-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+        }
+
+        .btn-success:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-share {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-share:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        input[type="color"] {
+            height: 45px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .val-display {
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <div class="control-panel">
+            <div style="text-align: right; margin-bottom: 10px;">
+                <h1
+                    style="font-size: 1.8rem; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    إعدادات الدعوة المتقدمة</h1>
+            </div>
+
+            <div class="panel-section">
+                <h3>🖼️ الصورة الشخصية</h3>
+                <label class="file-btn" for="userImageUpload">اختار صورتك من هنا</label>
+                <input type="file" id="userImageUpload" accept="image/*">
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>حجم الصورة <span class="val-display" id="scaleVal">100%</span></label>
+                    <input type="range" id="imageScale" min="0.5" max="3" value="1" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>إزاحة أفقية (يمين/يسار) <span class="val-display" id="imgXVal">0</span></label>
+                    <input type="range" id="imageX" min="-200" max="200" value="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>إزاحة رأسية (أعلى/أسفل) <span class="val-display" id="imgYVal">0</span></label>
+                    <input type="range" id="imageY" min="-200" max="200" value="0" step="1">
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>✍️ إعدادات الإسم</h3>
+                <div class="form-group">
+                    <label>الإسم الكريم</label>
+                    <input type="text" id="nameInput" placeholder="اكتب الاسم هنا..." maxlength="40">
+                </div>
+                <div class="form-group">
+                    <label>لون الخط</label>
+                    <input type="color" id="textColor" value="#1e293b">
+                </div>
+                <div class="form-group">
+                    <label>حجم الخط <span class="val-display" id="fontVal">42px</span></label>
+                    <input type="range" id="fontSize" min="20" max="100" value="42" step="1">
+                </div>
+                <div class="form-group">
+                    <label>موضع الإسم الأفقي <span class="val-display" id="textXVal">0</span></label>
+                    <input type="range" id="textX" min="-150" max="150" value="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>موضع الإسم الرأسي <span class="val-display" id="textYVal">0</span></label>
+                    <input type="range" id="textY" min="-150" max="150" value="0" step="1">
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <button class="btn btn-share" id="shareBtn">📤 مشاركة</button>
+                <button class="btn btn-success" id="downloadBtn">📥 تحميل الدعوة</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="canvas-wrapper">
+                <canvas id="mainCanvas" width="1000" height="1000"></canvas>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">معاينة حية
+                للدعوة. جميع التعديلات تظهر فوراً.</p>
+        </div>
+    </div>
+
+    <script>
+        class TefaSecurityGuard {
+            constructor() {
+                this.tefa_author = "tefa";
+                this.tefa_license = "Premium Rights Reserved";
+                this.tefa_verified = true;
+            }
+            verifyTefaRights() {
+                return this.tefa_verified && this.tefa_author === "tefa";
+            }
+            getTefaSignature() {
+                return "Powered by tefa";
+            }
+        }
+
+        const tefaManager = new TefaSecurityGuard();
+
+        (function () {
+            if (!tefaManager.verifyTefaRights()) return;
+
+            // الإحداثيات الصحيحة لتلائم الصورة بدقة (800x800)
+            const baseConfig = { cx: 601.5, cy: 271.5, radius: 119.5 };
+            const textConfig = { x: 41, y: 231, width: 335, height: 77 };
+            const TEMPLATE_URL = "https://i.postimg.cc/pVKRC32Z/IMG-20260409-WA0012.jpg";
+
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+            const userImageUpload = document.getElementById('userImageUpload');
+            const nameInput = document.getElementById('nameInput');
+            const textColor = document.getElementById('textColor');
+
+            const imageScale = document.getElementById('imageScale');
+            const imageX = document.getElementById('imageX');
+            const imageY = document.getElementById('imageY');
+            const fontSize = document.getElementById('fontSize');
+            const textX = document.getElementById('textX');
+            const textY = document.getElementById('textY');
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            const shareBtn = document.getElementById('shareBtn');
+
+            let templateImage = null;
+            let userImage = null;
+
+            function initTefaEngine() {
+                loadTemplate();
+                attachEventListeners();
+            }
+
+            function loadTemplate() {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                    templateImage = img;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    renderCanvasTefa();
+                };
+                img.src = TEMPLATE_URL;
+            }
+
+            function renderCanvasTefa() {
+                if (!templateImage) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(templateImage, 0, 0);
+
+                if (userImage) {
+                    const scale = parseFloat(imageScale.value);
+                    const oX = parseInt(imageX.value);
+                    const oY = parseInt(imageY.value);
+
+                    const scaledW = userImage.width * scale;
+                    const scaledH = userImage.height * scale;
+
+                    const drawX = baseConfig.cx - scaledW / 2 + oX;
+                    const drawY = baseConfig.cy - scaledH / 2 + oY;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(baseConfig.cx, baseConfig.cy, baseConfig.radius, 0, 2 * Math.PI);
+                    ctx.clip();
+                    ctx.drawImage(userImage, drawX, drawY, scaledW, scaledH);
+                    ctx.restore();
+                }
+
+                const name = nameInput.value.trim();
+                if (name) {
+                    const size = parseInt(fontSize.value);
+                    const tX = parseInt(textX.value);
+                    const tY = parseInt(textY.value);
+
+                    ctx.font = `bold ${size}px "Tajawal", Tahoma, sans-serif`;
+                    ctx.fillStyle = textColor.value;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    const finalX = textConfig.x + textConfig.width / 2 + tX;
+                    const finalY = textConfig.y + textConfig.height / 2 + tY;
+
+                    ctx.fillText(name, finalX, finalY);
+                }
+            }
+
+            function attachEventListeners() {
+                userImageUpload.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            userImage = img;
+                            const minScale = Math.max((baseConfig.radius * 2) / img.width, (baseConfig.radius * 2) / img.height);
+                            imageScale.value = minScale * 1.05;
+                            updateUIValues();
+                            renderCanvasTefa();
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                const inputs = [imageScale, imageX, imageY, fontSize, textX, textY, nameInput, textColor];
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        updateUIValues();
+                        renderCanvasTefa();
+                    });
+                });
+
+                downloadBtn.addEventListener('click', () => {
+                    if (!templateImage) return;
+                    renderCanvasTefa();
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'invitation_tefa.png';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }, 'image/png');
+                });
+
+                shareBtn.addEventListener('click', async () => {
+                    if (!templateImage) return;
+                    renderCanvasTefa();
+                    canvas.toBlob(async (blob) => {
+                        const file = new File([blob], "invitation.png", { type: "image/png" });
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                            try {
+                                await navigator.share({ files: [file] });
+                            } catch (err) { }
+                        } else {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'invitation_tefa.png';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                        }
+                    }, 'image/png');
+                });
+            }
+
+            function updateUIValues() {
+                document.getElementById('scaleVal').textContent = Math.round(parseFloat(imageScale.value) * 100) + '%';
+                document.getElementById('imgXVal').textContent = imageX.value;
+                document.getElementById('imgYVal').textContent = imageY.value;
+                document.getElementById('fontVal').textContent = fontSize.value + 'px';
+                document.getElementById('textXVal').textContent = textX.value;
+                document.getElementById('textYVal').textContent = textY.value;
+            }
+
+            initTefaEngine();
+        })();
+    </script>
+</body>
+
+</html>
